@@ -17,8 +17,6 @@ my ($desired_hunks, $leftovers) = eval { IncPatch::UI->filter_hunks($diff) };
 die $@ if $@ && $@ !~ /^User pressed 'q'$/;
 exit 0 if $@;
 
-print "\n";
-
 if (@$desired_hunks)
 {
     open my $patch, "| patch @patch_args"

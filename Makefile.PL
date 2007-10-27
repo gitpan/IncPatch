@@ -5,8 +5,9 @@ use inc::Module::Install;
 name           'IncPatch';
 all_from       'lib//IncPatch.pm';
 
-requires       'Term::ReadKey';
 requires       'Moose';
+requires       'Term::ReadKey';
+requires       'Term::CallEditor';
 requires       'IO::Pager';
 
 build_requires 'Test::More';

@@ -4,7 +4,7 @@ use Moose;
 
 has lines =>
 (
-    is  => 'ro',
+    is  => 'rw', # rw because user can edit the hunk in $EDITOR
     isa => 'ArrayRef',
 );
 
@@ -34,7 +34,7 @@ has to_timestamp =>
 
 has lines_affected =>
 (
-    is  => 'ro',
+    is  => 'rw', # rw because user can edit the hunk in $EDITOR
     isa => 'Str',
 );
 
@@ -54,13 +54,17 @@ sub as_string
 {
     my $self = shift;
 
-    return << "DIFF";
+    my $diff = << "HEADER";
 @{[ $self->diff_invocation || '' ]}
 --- @{[ $self->from_file ]}\t@{[ $self->from_timestamp ]}
 +++ @{[ $self->to_file ]}\t@{[ $self->to_timestamp ]}
 @@ @{[ $self->lines_affected ]} @@
-@{[ join "\n", @{$self->lines} ]}
-DIFF
+HEADER
+    $diff .= $_ for @{ $self->lines };
+
+    $diff .= "\n" unless substr($diff, -1, 1) eq "\n";
+
+    return $diff;
 }
 
 =head2 as_colored_string
@@ -73,18 +77,24 @@ sub as_colored_string
 {
     my $self = shift;
 
-    return << "DIFF";
+    my $diff = << "HEADER";
 \e[0;32m@{[ $self->diff_invocation || '' ]}\e[m
 \e[0;32m--- @{[ $self->from_file ]}\t@{[ $self->from_timestamp ]}\e[m
 \e[0;32m+++ @{[ $self->to_file ]}\t@{[ $self->to_timestamp ]}\e[m
 \e[0;33m@@ @{[ $self->lines_affected ]} @@\e[m
-@{[ join "\n", map {
-        $_ =~ /^-/ ? "\e[0;35m$_\e[m"
-                   : $_ =~ /^\+/
-                   ? "\e[0;36m$_\e[m"
-                   : $_
-    } @{$self->lines} ]}
-DIFF
+HEADER
+
+    $diff .= $_ for map {
+        $_ =~ /^-/
+            ? "\e[0;35m$_\e[m"
+        : $_ =~ /^\+/
+            ? "\e[0;36m$_\e[m"
+            : $_
+    } @{$self->lines};
+
+    $diff .= "\n" unless substr($diff, -1, 1) eq "\n";
+
+    return $diff;
 }
 
 1;

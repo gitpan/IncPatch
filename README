@@ -1,13 +1,22 @@
-IncPatch 0.01
+IncPatch 0.02
 
 IncPatch lets you incrementally apply one or more diffs. For example, you may
 have a diff that implements two separate features, and you only want one of
 them. You could manually chop the diff up into two, but that is tedious and
-potentially error-prone.
+potentially error-prone -- are you sure you got the headers right?
 
-The interface is very very similar to that of darcs record.
+Thankfully people are starting to take version control very seriously, so diff
+and patch are being ushered to the backstage. But they're still important! I
+use IncPatch to help manage many small but incomplete changes to large
+codebases. `svk diff > misc.diff`, `svk revert --recursive .`, then I can
+pull in any little changes from misc.diff that I want with IncPatch without
+them getting in the way of every commit.
+
+The interface is very similar to that of darcs record, because if you're
+going to imitate, you might as well imitate the best of them.
 
 MAJOR CHANGES
+    0.02: e command to edit hunks, echo input, much more doc
     0.01: first version
 
 INSTALLATION

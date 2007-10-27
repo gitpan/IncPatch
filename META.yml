@@ -1,5 +1,5 @@
 --- 
-abstract: incrementally apply diffs
+abstract: incrementally apply diffs with patch, a la darcs
 author: Shawn M Moore, C<< <sartak at gmail.com> >>
 build_requires: 
   Test::More: 0
@@ -17,5 +17,6 @@ no_index:
 requires: 
   IO::Pager: 0
   Moose: 0
+  Term::CallEditor: 0
   Term::ReadKey: 0
-version: 0.01
+version: 0.02

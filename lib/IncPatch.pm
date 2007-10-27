@@ -7,15 +7,15 @@ use IncPatch::UI;
 
 =head1 NAME
 
-IncPatch - incrementally apply diffs
+IncPatch - incrementally apply diffs with patch, a la darcs
 
 =head1 VERSION
 
-Version 0.01 released 27 Oct 07
+Version 0.02 released 27 Oct 07
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -26,9 +26,75 @@ our $VERSION = '0.01';
 IncPatch lets you incrementally apply one or more diffs. For example, you may
 have a diff that implements two separate features, and you only want one of
 them. You could manually chop the diff up into two, but that is tedious and
-potentially error-prone.
+potentially error-prone -- are you sure you got the headers right?
 
-The interface is very very similar to that of C<darcs record>.
+Thankfully people are starting to take version control very seriously, so diff
+and patch are being ushered to the backstage. But they're still important! I
+use IncPatch to help manage many small but incomplete changes to large
+codebases. C<< svk diff > misc.diff >>, C<svk revert --recursive .>, then I can
+pull in any little changes from C<misc.diff> that I want with IncPatch without
+them getting in the way of every commit.
+
+The interface is very similar to that of C<darcs record>, because if you're
+going to imitate, you might as well imitate the best of them.
+
+=head1 COMMANDS
+
+=over 4
+
+=item C<y>
+
+Apply this hunk.
+
+=item C<n>
+
+Don't apply this hunk.
+
+=item C<f>
+
+Apply the rest of the hunks to this file.
+
+=item C<s>
+
+Don't apply the rest of the hunks to this file.
+
+=item C<a>
+
+Apply all the remaining hunks.
+
+=item C<d>
+
+Apply selected hunks.
+
+=item C<j>
+
+Skip to next hunk.
+
+=item C<k>
+
+Back up to previous hunk.
+
+=item C<p>
+
+View this hunk in your pager.
+
+=item C<e>
+
+Edit this hunk in your editor.
+
+=item C<?>
+
+Show this help.
+
+=item C<Space>
+
+Accept the current default (which is capitalized).
+
+=item C<q>
+
+Quit IncPatch. Apply no hunks.
+
+=back
 
 =head1 TODO
 
@@ -39,6 +105,8 @@ The interface is very very similar to that of C<darcs record>.
 IncPatch currently only knows about unified diffs. It should include support
 contextual diffs, maybe even ed diffs :) It really just needs to know how to
 split a diff up.
+
+Self: look at L<patch>, which parses the four common diff forms.
 
 =item
 
@@ -54,8 +122,37 @@ parsing.
 
 =item
 
-'e' command to edit the hunk. This may be a power-user only command, so much
-so that it would be hidden from the main "Shall I.." prompt.
+The 'e' command needs to update lines_affected for you.
+
+=item
+
+Handle receiving diffs on STDIN, perhaps using perlfaq8's HotKey module.
+
+=item
+
+Add an argument to spit out the unused hunks.
+
+=item
+
+Make the colors configurable, and by default off.
+
+=item
+
+A "real" man page.
+
+=item
+
+Build more concise patches so that patch doesn't repeat itself with many hunks.
+
+=item
+
+C<darcs> has a notion of "waiting" hunks, with the C<w> command. I haven't
+grokked what this actually does yet. It certainly affects other commands.
+
+=item
+
+Improve the various interfaces. We at least want IncPatch::Hunk to be an
+abstract base class, with C<to_patch> and C<display> methods. Then we'd have IncPatch::Hunk::Unified, IncPatch::Hunk::Contextual, etc.
 
 =back
 
@@ -66,6 +163,10 @@ C<darcs>, L<SVK::Command::Commit>, L<SVK::Editor::InteractiveStatus>
 =head1 AUTHOR
 
 Shawn M Moore, C<< <sartak at gmail.com> >>
+
+=head1 CODE
+
+The code lives in a darcs repository at L<http://sartak.org/code/cpan/IncPatch/>
 
 =head1 BUGS
 

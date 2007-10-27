@@ -3,7 +3,20 @@ package IncPatch::UI;
 use strict;
 use warnings;
 use Term::ReadKey;
+use Term::CallEditor;
 use IO::Pager;
+
+=head2 to_user
+
+Displays a line of text to the user. This is just a thin wrapper around print
+that can be overridden.
+
+=cut
+
+sub to_user
+{
+    print @_;
+}
 
 =head2 read_key
 
@@ -21,20 +34,10 @@ sub read_key
     my $c = ReadKey(0);
     ReadMode(0);
     die "Error reading key from user." if !defined($c);
+    to_user $c;
+    to_user "\n" unless $c eq "\n";
 
     return $c;
-}
-
-=head2 to_user
-
-Displays a line of text to the user. This is just a thin wrapper around print
-that can be overridden.
-
-=cut
-
-sub to_user
-{
-    print @_;
 }
 
 =head2 prompt_user PARAMHASH
@@ -142,20 +145,29 @@ sub prompt_user
             $args{change_count},
             $args{command_string};
 
-        $c = read_key();
+        $c = lc read_key();
         $c = $args{default} if $c eq ' ';
 
         return $args{commands}->{$c} if exists $args{commands}->{$c};
 
-        to_user "\nInvalid response, try again!\n";
+        to_user "Invalid response, try again!\n";
     }
 }
 
 =head2 filter_hunks DIFF
 
-Takes an IncPatch::Diff object and filters out any undesired hunks.
+Takes an IncPatch::Diff object and filters out any undesired hunks. Through
+the user, of course.
 
-This will return an array of IncPatch::Hunk objects.
+This will return a double of (an arrayref of selected IncPatch::Hunk objects,
+an arrayref of unselected IncPatch::Hunk objects).
+
+If you want to override a function so that you can get darcs-record-like
+goodness, this is the one. You want to pass in a reference that has a method
+C<hunks> that returns an arrayref of hunks. Each hunk is a reference that have
+the methods: C<as_string>, C<as_colored_string>, and C<to_file>. C<to_file> is
+just the name of the file the hunk is being applied to - it's used in the C<s>
+and C<f> commands.
 
 =cut
 
@@ -194,11 +206,25 @@ sub filter_hunks
         },
 
         p => sub {
-            to_user "\n";
-
             local $STDOUT = new IO::Pager *STDOUT;
             print $hunks[$i]->as_string;
             close STDOUT;
+        },
+
+        e => sub {
+            my ($fh, $fn) = solicit("@@ " . $hunks[$i]->lines_affected . " @@\n" . join '', @{$hunks[$i]->lines});
+            warn "$Term::CallEditor::errstr\n" and return
+                unless $fh;
+
+            # just reading from $fh gets the old text on OS X. ugh
+            open my $fh2, '<', $fn
+                or do { warn "Unable to open $fn for reading: $!"; return };
+
+            my $affected = <$fh2>;
+            $affected =~ s/^\@\@\s*(.+?)\s*\@\@\n?/$1/;
+            $hunks[$i]->lines_affected($affected);
+
+            $hunks[$i]->lines( [<$fh2>] );
         },
 
         '?' => sub {
@@ -218,6 +244,7 @@ j: skip to next hunk
 k: back up to previous hunk
 
 p: view this hunk in your pager
+e: edit this hunk in your editor
 
 ?: show this help
 
@@ -241,7 +268,7 @@ HELP
             change_count   => scalar(@hunks),
             default        => $selected[$i] ? 'y' : 'n',
             filter_string  => 1,
-            command_string => "ynfsadjkpq",
+            command_string => "ynfsadjkpeq",
             commands       => $commands,
         );
 

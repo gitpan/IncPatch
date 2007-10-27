@@ -74,7 +74,7 @@ for my $hunk (@hunks)
 is($hunks[0]->lines_affected, "-3,7 +3,7", "correct lines affected");
 is($hunks[1]->lines_affected, "-149,24 +149,14", "correct lines affected");
 is(@{ $hunks[0]->lines }, 8, "eight lines in first hunk");
-is(@{ $hunks[1]->lines }, 30, "30 lines in second hunk");
+is(@{ $hunks[1]->lines }, 31, "31 lines in second hunk");
 
 is($hunks[0]->as_string, <<'HUNK0', 'first hunk correctly passed through');
 diff -rN -u old-2.0/lib/Interhack/Plugin/Util/Util.pm new-2.0/lib/Interhack/Plugin/Util/Util.pm
@@ -126,4 +126,5 @@ diff -rN -u old-2.0/lib/Interhack/Plugin/Util/Util.pm new-2.0/lib/Interhack/Plug
  
      $self->restore_row(2);
  } # }}}
+
 HUNK1

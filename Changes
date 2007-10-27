@@ -1,5 +1,10 @@
 Revision history for IncPatch
 
+0.02    Sat Oct 27 13:46:56 2007
+        Add 'e' command to edit hunks
+        Echo the input keys
+        Expanded doc
+
 0.01    Sat Oct 27 03:43:10 2007
-        First version, after a four hour hackathon.
+        First version, after a four hour hackathon
 

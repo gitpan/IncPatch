@@ -99,7 +99,8 @@ sub parse_unified
 {
     my $self = shift;
     my $diff = shift;
-    my @input = split /\n/, $diff;
+
+    open my $diff_fh, '<', \$diff;
 
     my $invocation;
 
@@ -109,11 +110,11 @@ sub parse_unified
     my $lines_affected;
     my @lines;
 
-    while (defined(local $_ = shift @input))
+    while (<$diff_fh>)
     {
         if (/^diff/)
         {
-            $invocation = $_;
+            chomp($invocation = $_);
             # always start of a new hunk, except the first time around
             if (defined $lines_affected)
             {
