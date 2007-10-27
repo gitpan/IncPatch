@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use IncPatch;
+
+#XXX: this script desperately needs a cleanup
+
+my @patch_args;
+@ARGV = map { $_ =~ /^-/ ? do { push @patch_args, $_; () } : $_ } @ARGV;
+
+die "Usage: $0 diff1 [diff2 [diff3 [...] ] ]\nNote: any options are passed to patch. this can't handle whacky quoting yet, so don't goof around." unless @ARGV;
+
+my $text = do { local $/; <> };
+my $diff = IncPatch::Diff->new($text);
+
+my ($desired_hunks, $leftovers) = eval { IncPatch::UI->filter_hunks($diff) };
+die $@ if $@ && $@ !~ /^User pressed 'q'$/;
+exit 0 if $@;
+
+print "\n";
+
+if (@$desired_hunks)
+{
+    open my $patch, "| patch @patch_args"
+        or die "Unable to open a pipe to patch: $!";
+    print { $patch } map { $_->as_string } @$desired_hunks
+        or die "Unable to print to patch: $!";
+    close $patch;
+}
+else
+{
+    print "You don't want to apply anything? Okay.\n";
+}
+

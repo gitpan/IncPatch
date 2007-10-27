@@ -1,0 +1,49 @@
+IncPatch 0.01
+
+IncPatch lets you incrementally apply one or more diffs. For example, you may
+have a diff that implements two separate features, and you only want one of
+them. You could manually chop the diff up into two, but that is tedious and
+potentially error-prone.
+
+The interface is very very similar to that of darcs record.
+
+MAJOR CHANGES
+    0.01: first version
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc IncPatch
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/IncPatch
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=IncPatch
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/IncPatch
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/IncPatch
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Shawn M Moore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
